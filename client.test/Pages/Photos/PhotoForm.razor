@@ -1,0 +1,42 @@
+﻿@inject ApiRequest api
+
+<MudGrid>
+    <MudItem xs="12" sm="12" md="12">
+        <MudExpansionPanel>
+            <MudExpansionPanels>
+                <EditForm Model="@_photo">
+                    <MudGrid>
+                        <MudItem xs="12" sm="12" md="12">
+                            <MudTextField @bind-Value="@_photo.Name" Label="Name" Placeholder="Photo name" />
+                        </MudItem>
+                        <MudItem xs="12" sm="12" md="12">
+                            <MudTextField @bind-Value="@_photo.Url" />
+                        </MudItem>
+                    </MudGrid>
+                </EditForm>
+            </MudExpansionPanels>
+        </MudExpansionPanel>
+    </MudItem>
+</MudGrid>
+
+<Loading Show="_showLoading" />
+
+@code {
+    [Parameter] public int HotelId { get; set; }
+
+    List<HotelPhoto> _photos = new();
+    HotelPhoto _photo = new();
+    private bool _showLoading = false;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await GetPhotos();
+    }
+
+    async Task GetPhotos()
+    {
+        _showLoading = true;
+        _photos = await api.GetTAsync<List<HotelPhoto>>($"photos/{HotelId}");
+        _showLoading = false;
+    }
+}

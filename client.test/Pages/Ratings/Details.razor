@@ -1,0 +1,36 @@
+﻿@inject ApiRequest api
+<MudGrid>
+    @if (_ratings.Count > 0)
+    {
+        foreach (CustomerRating item in _ratings)
+        {
+            <MudItem xs="4" sm="4" md="4">
+                @item.UserName
+            </MudItem>
+            <MudItem xs="8" sm="8" md="8">
+                <MudRating MaxValue="5" SelectedValue="@item.Rating" ReadOnly="true" />
+            </MudItem>
+        }
+    }
+</MudGrid>
+
+<Loading Show="@_showLoading" />
+
+@code {
+    [Parameter] public int HotelId { get; set; }
+
+    private List<CustomerRating> _ratings = new();
+    private bool _showLoading = false;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await GetRatings();
+    }
+
+    async Task GetRatings()
+    {
+        _showLoading = true;
+        _ratings = await api.GetTAsync<List<CustomerRating>>($"ratings/{HotelId}");
+        _showLoading = false;
+    }
+}

@@ -1,0 +1,78 @@
+﻿@inject ApiRequest api
+@page "/photos/{id:int}"
+
+<MudPaper Elevation="1">
+    <MudText Typo="Typo.h3">Photos</MudText>
+    <MudGrid>
+        <MudItem xs="12" sm="12" md="6">
+            <EditForm Model="@_photo" OnValidSubmit="@SubmitData">
+                <MudCard>
+                    <MudCardContent>
+                        <MudTextField @bind-Value="@_photo.Name" Label="Name" Placeholder="Photo Name" />
+                        <MudTextField @bind-Value="@_photo.Url" Label="Name" Placeholder="https://example.com" />
+                    </MudCardContent>
+                    <MudCardActions>
+                        <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" StartIcon="@Icons.Material.Outlined.Save">Save</MudButton>
+                    </MudCardActions>
+                </MudCard>
+            </EditForm>
+        </MudItem>
+        <MudItem xs="12" sm="12" md="6">
+            <MudGrid>
+                @foreach (HotelPhoto item in _photos)
+                {
+                    <MudLink Href="@item.Url" Target="_blank">
+                        <MudTooltip Text="@item.Name">
+                            <img class="img-fluid" height="200" src="@item.Url" alt="@item.Name" />
+                        </MudTooltip>
+                        
+                    </MudLink>
+                }
+            </MudGrid>
+        </MudItem>
+    </MudGrid>
+
+</MudPaper>
+
+<Loading Show="_showLoading" />
+
+@code {
+    [Parameter] public int id { get; set; }
+
+    List<HotelPhoto> _photos = new();
+    HotelPhoto _photo = new();
+
+    private bool _showLoading = false;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await GetPhotos();
+    }
+
+    async Task SubmitData()
+    {
+        _showLoading = true;
+        _photo.HotelId = id;
+
+
+        await api.PostAsync<HotelPhoto>("photos", _photo);
+        _showLoading = false;
+
+
+        _photo = new();
+        await GetPhotos();
+    }
+
+    async Task GetPhotos()
+    {
+        _showLoading = true;
+        _photos = await api.GetTAsync<List<HotelPhoto>>($"photos/{id}");
+        _showLoading = false;
+    }
+
+    async Task GetDetail()
+    {
+
+    }
+
+}

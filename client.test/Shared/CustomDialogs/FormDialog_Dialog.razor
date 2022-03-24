@@ -1,0 +1,11 @@
+﻿<MudDialog>
+    <DialogContent>
+        @Content
+    </DialogContent>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [Parameter] public RenderFragment Content { get; set; }
+
+}

@@ -1,0 +1,37 @@
+﻿<EditForm Model="@Hotels" OnValidSubmit="@OnValidSubmit">
+    <DataAnnotationsValidator />
+    <MudCard>
+        <MudCardContent>
+            <MudGrid>
+                <MudItem xs="12" sm="12" md="12">
+                    <MudTextField Label="Name" @bind-Value="Hotels.HotelName" />
+                </MudItem>
+                <MudItem xs="12" sm="12" md="12">
+                    <MudTextField Label="Price" @bind-Value="Hotels.Price" />
+                </MudItem>
+                <MudItem xs="12" sm="12" md="12">
+                    <MudText Typo="Typo.body1">Category</MudText>
+                    <MudRadioGroup @bind-SelectedOption="@Hotels.Category">
+                        <MudRadio T="byte" Option="5">5 Starts</MudRadio>
+                        <MudRadio T="byte" Option="4">4 Starts</MudRadio>
+                        <MudRadio T="byte" Option="3">3 Starts</MudRadio>
+                        <MudRadio T="byte" Option="2">2 Starts</MudRadio>
+                        <MudRadio T="byte" Option="1">1 Starts</MudRadio>
+                    </MudRadioGroup>
+                </MudItem>
+            </MudGrid>
+        </MudCardContent>
+        <MudCardActions>
+            <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" StartIcon="@Icons.Material.Outlined.Save">
+                <MudText>Save</MudText>
+            </MudButton>
+
+        </MudCardActions>
+    </MudCard>
+</EditForm>
+
+@code {
+    [Parameter] public Hotels Hotels { get; set; }
+    [Parameter] public EventCallback OnValidSubmit { get; set; }
+
+}

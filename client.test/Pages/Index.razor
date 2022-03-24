@@ -1,0 +1,134 @@
+﻿@page "/"
+@inject ApiRequest api
+@inject IDialogService DialogService
+@inject ISnackbar SnackBar
+
+<MudPaper>
+    <MudText Typo="Typo.h3">Hotels</MudText>
+
+    <MudPaper Elevation="0">
+        <MudToolBar>
+            <MudTooltip Text="Add New Hotel">
+                <MudIconButton Icon="@Icons.Material.Outlined.Add" @onclick="@SetAddForm" />
+            </MudTooltip>
+
+        </MudToolBar>
+    </MudPaper>
+
+    <MudTable Items="@_hotels" Loading="@(_hotels.Count > 0 ? false : true)">
+        <HeaderContent>
+            <MudTd>#</MudTd>
+            <MudTh>Name</MudTh>
+            <MudTh>Price</MudTh>
+            <MudTh>Category</MudTh>
+            <MudTh>Images</MudTh>
+            <MudTh>Ratings</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd><MudIconButton Icon="@Icons.Material.Outlined.Edit" @onclick="@(() => GetDetail(context.HotelId))" /></MudTd>
+            <MudTd>@context.HotelName</MudTd>
+            <MudTd>@context.Price</MudTd>
+            <MudTd>
+                <MudTooltip Text="@($"{context.Category} starts")">
+                    <MudRating SelectedValue="@context.Category" ReadOnly="true" />
+                </MudTooltip>
+            </MudTd>
+            <MudTd>
+                <MudTooltip Text="Show Images">
+                    <MudIconButton Icon="@Icons.Material.Outlined.Image" Link="@($"/photos/{context.HotelId}")" Target="_blank" />
+                </MudTooltip>
+                <MudTooltip Text="Upload images">
+                    <MudIconButton Icon="@Icons.Material.Outlined.FileUpload" />
+                </MudTooltip>
+            </MudTd>
+            <MudTd>
+                <MudTooltip Text="Add/Show Ratings">
+                    <MudIconButton Icon="@Icons.Material.Outlined.StarHalf" @onclick="@(() =>ToggleOpenPopover(context.HotelId))" />
+                </MudTooltip>
+
+            </MudTd>
+        </RowTemplate>
+    </MudTable>
+</MudPaper>
+
+@if (_showDialog)
+{
+    <FormDialog Title="@(_hotel != null ? "Edit Hotel": "Add Hotel")">
+        <Content>
+            <HotelForm Hotels="_hotel" OnValidSubmit="@SubmitData" />
+        </Content>
+    </FormDialog>
+}
+
+@if (_showRatingDialog)
+{
+    <FormDialog Title="Ratings">
+        <Content>
+            <client.test.Pages.Ratings.Details HotelId="@_hotelId" />
+        </Content>
+    </FormDialog>
+}
+
+@if (_showImageDialog) { 
+}
+
+<Loading Show="_showLoading" />
+
+@code {
+
+    List<Hotels> _hotels = new();
+    Hotels _hotel = new();
+    bool _showDialog = false;
+    bool _showLoading = false;
+    bool _showRatingDialog = false;
+    bool _showImageDialog = false;
+    int _hotelId = 0;
+
+    protected override async Task OnInitializedAsync() => await GetHotels();
+
+    async Task GetHotels() => _hotels = await api.GetTAsync<List<Hotels>>("hotel");
+
+    async Task GetDetail(int id)
+    {
+        _showLoading = true;
+        _showDialog = false;
+        _showRatingDialog = false;
+
+        _hotel = await api.GetTAsync<Hotels>($"hotel/{id}");
+
+        _showDialog = true;
+        _showLoading = false;
+    }
+
+    async Task SubmitData()
+    {
+        _showLoading = true;
+        _showDialog = false;
+        if (_hotel.HotelId == 0)
+            await api.PostAsync<Hotels>("hotel", _hotel);
+        else
+            await api.PutAsync<Hotels>($"hotel/{_hotel.HotelId}", _hotel);
+
+
+        await GetHotels();
+
+        _showLoading = false;
+        _showDialog = false;
+        SnackBar.Add("Data successfully saved", Severity.Success);
+    }
+
+    private void SetAddForm()
+    {
+        _hotel = new();
+        _showDialog = true;
+    }
+
+    private void ToggleOpenPopover(int hotelId) {
+        _showRatingDialog = false;
+        _showDialog = false;
+        _hotelId = hotelId;
+        _showRatingDialog = true;
+
+    }
+
+}

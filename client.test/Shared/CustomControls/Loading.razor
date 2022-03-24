@@ -1,0 +1,10 @@
+﻿<MudOverlay @bind-Visible="Show" DarkBackground="true" ZIndex="1000000000">
+    <ChildContent>
+        <MudProgressCircular Color="Color.Primary" Style="height:70px;width:70px;" Indeterminate="true" />
+    </ChildContent>
+</MudOverlay>
+
+@code {
+    [Parameter] public bool Show { get; set; }
+
+}

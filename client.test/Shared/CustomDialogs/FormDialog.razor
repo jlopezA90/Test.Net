@@ -1,0 +1,21 @@
+﻿@inject IDialogService DialogService
+
+
+@code {
+    [Parameter] public string Title { get; set; }
+    [Parameter] public RenderFragment Content { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        ShowDialog();
+    }
+
+    void ShowDialog()
+    {
+        DialogParameters parameters = new();
+
+        parameters.Add("Content", Content);
+
+        DialogService.Show<FormDialog_Dialog>(Title, parameters);
+    }
+}
